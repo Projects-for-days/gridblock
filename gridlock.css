@@ -1,0 +1,22 @@
+body{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;   
+}
+#board{
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    gap: 5px
+
+}
+
+#board div {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    font-size: 20px;
+    cursor: pointer;
+}
