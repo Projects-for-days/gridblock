@@ -1,0 +1,35 @@
+.App {
+    text-align: center;
+    padding: 20px;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    gap: 5px;
+    margin: 20px auto;
+    width: fit-content;
+}
+
+#board div {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: white  ;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+#board div:hover {
+    background-color: grey;
+}
+
+#board div.clicked {
+    background-color: lightpink;
+    font-weight: bold;
+}
