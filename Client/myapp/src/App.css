@@ -1,35 +1,49 @@
 .App {
-    text-align: center;
-    padding: 20px;
+  text-align: center;
+  padding: 20px;
 }
 
 #board {
-    display: grid;
-    grid-template-columns: repeat(5, 60px);
-    gap: 5px;
-    margin: 20px auto;
-    width: fit-content;
+  display: grid;
+  grid-template-columns: repeat(5, 60px);
+  gap: 6px;
+  margin: 20px auto;
+  width: fit-content;
 }
 
 #board div {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid black;
-    font-size: 20px;
-    cursor: pointer;
-    background-color: white  ;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  font-size: 20px;
+  border: 1px solid green;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: white;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 #board div:hover {
-    background-color: grey;
+  background-color: grey;
 }
 
 #board div.clicked {
-    background-color: lightpink;
-    font-weight: bold;
+  background-color: lightpink;
+  font-weight: bold;
+}
+
+#banner {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: white;
+  color: gray;
+  border-radius: 6px;
+  font-weight: 700;
+  text-align: center;
+  font-size: 50px;
 }
