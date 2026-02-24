@@ -13,20 +13,21 @@ body{
 #board{
     display: grid;
     grid-template-columns: repeat(5, 60px);
-    gap: 8px
+    gap: 10px
 
 }
 /*board cells*/
 #board div {
-    width: 70px;
-    height: 70px;
+    width: 65px;
+    height: 65px;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 1px solid green;
+    border-radius: 6px;
     background-color: #1a1f1c;
     color: white;
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
