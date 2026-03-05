@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GridBlock - Lobby</title>
+  <link rel="stylesheet" href="gridlock.css" />
+</head>
+
+<body>
+  <div class="lobby">
+    <div class="lobby-overlay">
+
+      <div class="lobby-card">
+        <h1 class="lobby-title">Grid<span>Block</span></h1>
+        <p class="lobby-subtitle">Create a room or join with a code</p>
+
+        <div class="lobby-field">
+          <label class="lobby-label" for="playerName">Name</label>
+          <input class="lobby-input" id="playerName" type="text" placeholder="Enter your name" />
+        </div>
+
+        <div class="lobby-field">
+          <label class="lobby-label" for="roomCode">Room Code</label>
+          <input class="lobby-input" id="roomCode" type="text" placeholder="Enter room code" />
+        </div>
+
+        <div class="lobby-buttons">
+          <button class="lobby-btn lobby-btn-primary" id="createBtn">Create Room</button>
+          <button class="lobby-btn lobby-btn-secondary" id="joinBtn">Join Room</button>
+        </div>
+
+        <p class="lobby-hint">Tip: Share the room code with your friend to play.</p>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

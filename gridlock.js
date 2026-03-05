@@ -44,7 +44,7 @@ const timerButton = document.getElementById("timer-button");
 
 // Update the display function
 function updateTimerDisplay(time) {
-    timerButton.textContent = `Time: ${time}s`;
+    timerButton.textContent = `${time}`;
 }
 
 // Start the turn timer
