@@ -4,7 +4,7 @@
   "description": "GridBlock multiplayer game server with WebSocket support",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node Src/index.js",
     "dev": "nodemon src/index.js"
   },
   "keywords": ["gridblock", "multiplayer", "websocket", "game"],
