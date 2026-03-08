@@ -1,0 +1,372 @@
+.game-room {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0f0d 0%, #1a1f1c 100%);
+  color: white;
+  font-family: 'Doto', sans-serif;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 2px solid #00ff88;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.game-title {
+  font-size: 2em;
+  margin: 0;
+  font-weight: 900;
+}
+
+.room-code {
+  color: #7dd3ae;
+  font-size: 0.9em;
+}
+
+.code {
+  color: #00ff88;
+  font-weight: 700;
+  letter-spacing: 2px;
+  background: rgba(0, 255, 136, 0.1);
+  padding: 5px 15px;
+  border-radius: 5px;
+}
+
+.leave-btn {
+  padding: 10px 20px;
+  background: rgba(255, 68, 68, 0.2);
+  border: 2px solid #ff4444;
+  color: #ff6b6b;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Doto', sans-serif;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.leave-btn:hover {
+  background: rgba(255, 68, 68, 0.3);
+  transform: translateY(-2px);
+}
+
+.game-container {
+  display: grid;
+  grid-template-columns: 250px 1fr 300px;
+  gap: 20px;
+  padding: 20px;
+  min-height: calc(100vh - 100px);
+}
+
+/* Sidebars */
+.sidebar {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #00ff88;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sidebar h3 {
+  margin: 0;
+  color: #00ff88;
+  font-size: 1.2em;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+}
+
+/* Players List */
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.player-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  transition: all 0.3s ease;
+}
+
+.player-card.current-player {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.player-card.active-turn {
+  border-color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.6);
+  }
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.player-name {
+  font-weight: 700;
+  color: white;
+  font-size: 0.95em;
+}
+
+.player-score {
+  color: #7dd3ae;
+  font-size: 0.85em;
+}
+
+.ready-status {
+  color: #999;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+
+.ready-status.ready {
+  color: #00ff88;
+  font-weight: 700;
+}
+
+.turn-indicator {
+  color: #ffc107;
+  font-weight: 700;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+
+.ready-btn {
+  padding: 12px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 2px solid #00ff88;
+  color: #00ff88;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Doto', sans-serif;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.ready-btn:hover {
+  background: rgba(0, 255, 136, 0.2);
+}
+
+.ready-btn.ready {
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6f 100%);
+  color: #0a0f0d;
+}
+
+.waiting-message {
+  text-align: center;
+  color: #7dd3ae;
+  font-size: 0.9em;
+  padding: 15px;
+  background: rgba(0, 255, 136, 0.05);
+  border-radius: 8px;
+}
+
+/* Main Game Area */
+.game-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+}
+
+.game-status {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.status-waiting,
+.status-winner,
+.status-playing {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #00ff88;
+  border-radius: 15px;
+  padding: 30px;
+}
+
+.status-waiting h2,
+.status-winner h2 {
+  margin: 0 0 10px 0;
+  color: #00ff88;
+  font-size: 2em;
+}
+
+.status-waiting p,
+.status-winner p {
+  margin: 0;
+  color: #7dd3ae;
+  font-size: 1.1em;
+}
+
+.reset-btn {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6f 100%);
+  color: #0a0f0d;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Doto', sans-serif;
+  font-weight: 700;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+}
+
+.turn-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.turn-info h3 {
+  margin: 0;
+  color: #00ff88;
+  font-size: 1.5em;
+}
+
+.timer {
+  font-size: 2em;
+  font-weight: 900;
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 2px solid #ffc107;
+}
+
+.lines-counter {
+  color: #7dd3ae;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.called-numbers {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.called-numbers h4 {
+  margin: 0 0 10px 0;
+  color: #00ff88;
+}
+
+.numbers-list {
+  color: #7dd3ae;
+  font-size: 1em;
+  line-height: 1.6;
+}
+
+/* Chat */
+.sidebar-right {
+  max-height: calc(100vh - 140px);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 500px;
+}
+
+.chat-message {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 3px solid #00ff88;
+}
+
+.chat-name {
+  color: #00ff88;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.chat-text {
+  color: #7dd3ae;
+}
+
+.chat-input {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 8px;
+  color: white;
+  font-family: 'Doto', sans-serif;
+}
+
+.chat-input input:focus {
+  outline: none;
+  border-color: #00ff88;
+}
+
+.chat-input button {
+  padding: 10px 15px;
+  background: #00ff88;
+  color: #0a0f0d;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Doto', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chat-input button:hover {
+  background: #00cc6f;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .game-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  
+  .sidebar {
+    max-height: none;
+  }
+}
