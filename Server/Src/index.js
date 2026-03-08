@@ -12,11 +12,14 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ['http://localhost:3000', 'http://localhost:5173'], // Support both CRA and Vite
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://tangerine-travesseiro-8d8fa9.netlify.app'
+    ],
     methods: ['GET', 'POST']
   }
 });
-
 app.get('/', (req, res) => {
   res.send('GridBlock server is running!');
 });
