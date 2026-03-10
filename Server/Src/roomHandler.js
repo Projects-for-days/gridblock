@@ -1,4 +1,4 @@
-const { createRoom, joinRoom, leaveRoom, getRoom } = require('./gameManager');
+const { createRoom, joinRoom, leaveRoom } = require('./gameManager');
 
 function roomHandler(io, socket) {
 
@@ -31,7 +31,16 @@ function roomHandler(io, socket) {
 
   // When a player disconnects
   socket.on('disconnect', () => {
-    leaveRoom(socket.id);
+    const result = leaveRoom(socket.id);
+    if (!result) return;
+    const { roomCode, leftPlayerName, room } = result;
+    // Inform everyone who is still in the room
+    if (room) {
+      io.to(roomCode).emit('player_left', { room, playerName: leftPlayerName });
+    } else {
+      // Room was deleted (last player left)
+      io.to(roomCode).emit('player_left', { room: null, playerName: leftPlayerName });
+    }
   });
 }
 

@@ -53,6 +53,18 @@
   align-items: flex-start;
 }
 
+.notice-banner {
+  max-width: 860px;
+  margin: 0 auto 16px auto;
+  background: #fff8e8;
+  color: #6b4f00;
+  border: 1px solid rgba(240, 173, 78, 0.45);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
 .gameroom-left {
   display: flex;
   flex-direction: column;
@@ -222,4 +234,19 @@
 .gameroom-winner h1 {
   font-size: 52px;
   margin-bottom: 16px;
+}
+
+.play-again-button {
+  background: #1a1a2e;
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  font-size: 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.play-again-button:hover {
+  opacity: 0.9;
 }

@@ -1,7 +1,17 @@
 const {
   getRoom, markNumberOnAllBoards,
-  advanceTurn, getCurrentPlayer
+  advanceTurn, getCurrentPlayer, resetGame
 } = require('./gameManager');
+
+function generateBoard() {
+  let numbers = [];
+  for (let i = 1; i <= 25; i++) numbers.push(i);
+  for (let i = numbers.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+  }
+  return numbers;
+}
 
 function gameHandler(io, socket) {
 
@@ -101,6 +111,22 @@ function gameHandler(io, socket) {
   socket.on('player_won', ({ roomCode, playerName }) => {
     io.to(roomCode).emit('game_over', { winnerName: playerName });
     console.log(`${playerName} won in room ${roomCode}`);
+  });
+
+  // When any player clicks play again — reset the room for everyone
+  socket.on('play_again', (roomCode) => {
+    const room = getRoom(roomCode);
+    if (!room) return;
+
+    const reset = resetGame(roomCode);
+    if (!reset) return;
+
+    io.to(roomCode).emit('room_reset', {
+      room: reset,
+      players: reset.players.map(p => ({ id: p.id, name: p.name }))
+    });
+
+    console.log(`Room reset in room ${roomCode}`);
   });
 }
 

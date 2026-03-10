@@ -17,10 +17,19 @@ function App() {
   // When someone joins our room, update room state so host sees updated player list and can start
   useEffect(() => {
     if (!socket || !room) return;
-    socket.on('player_joined', (updatedRoom) => {
-      setRoom(updatedRoom);
-    });
-    return () => socket.off('player_joined');
+    const onPlayerJoined = (updatedRoom) => setRoom(updatedRoom);
+    const onPlayerLeft = ({ room: updatedRoom }) => setRoom(updatedRoom);
+    const onRoomReset = ({ room: updatedRoom }) => setRoom(updatedRoom);
+
+    socket.on('player_joined', onPlayerJoined);
+    socket.on('player_left', onPlayerLeft);
+    socket.on('room_reset', onRoomReset);
+
+    return () => {
+      socket.off('player_joined', onPlayerJoined);
+      socket.off('player_left', onPlayerLeft);
+      socket.off('room_reset', onRoomReset);
+    };
   }, [socket, room]);
 
   if (!room) {

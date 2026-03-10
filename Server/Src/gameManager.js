@@ -56,9 +56,24 @@ function joinRoom(roomCode, playerName, socketId) {
 function leaveRoom(socketId) {
   for (const code in rooms) {
     const room = rooms[code];
-    room.players = room.players.filter(p => p.id !== socketId);
-    if (room.players.length === 0) delete rooms[code];
+    const leavingIndex = room.players.findIndex(p => p.id === socketId);
+    if (leavingIndex === -1) continue;
+
+    const leavingPlayer = room.players[leavingIndex];
+    room.players.splice(leavingIndex, 1);
+
+    // Keep currentTurnIndex valid after removal
+    if (room.currentTurnIndex > leavingIndex) room.currentTurnIndex--;
+    if (room.currentTurnIndex >= room.players.length) room.currentTurnIndex = 0;
+
+    if (room.players.length === 0) {
+      delete rooms[code];
+      return { roomCode: code, leftPlayerName: leavingPlayer.name, room: null };
+    }
+
+    return { roomCode: code, leftPlayerName: leavingPlayer.name, room };
   }
+  return null;
 }
 
 function getRoom(roomCode) {
@@ -93,7 +108,23 @@ function getCurrentPlayer(roomCode) {
   return room.players[room.currentTurnIndex];
 }
 
+function resetGame(roomCode) {
+  const room = rooms[roomCode];
+  if (!room) return null;
+
+  room.players = room.players.map(p => ({
+    ...p,
+    board: generateBoard(),
+    markedNumbers: []
+  }));
+  room.gameStarted = false;
+  room.currentTurnIndex = 0;
+  room.calledNumbers = [];
+  room.calledNumbersWithCaller = [];
+  return room;
+}
+
 module.exports = {
   createRoom, joinRoom, leaveRoom, getRoom,
-  markNumberOnAllBoards, advanceTurn, getCurrentPlayer
+  markNumberOnAllBoards, advanceTurn, getCurrentPlayer, resetGame
 };

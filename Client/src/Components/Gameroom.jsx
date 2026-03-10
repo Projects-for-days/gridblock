@@ -27,6 +27,7 @@ export default function Gameroom({ room, playerName }) {
   const [gameError, setGameError] = useState('');
   const [winnerName, setWinnerName] = useState(null);
   const [calledNumbersWithCaller, setCalledNumbersWithCaller] = useState([]);
+  const [notice, setNotice] = useState('');
 
   const myId = socket?.id;
   const isMyTurn = currentTurn === myId;
@@ -55,6 +56,7 @@ export default function Gameroom({ room, playerName }) {
       setCurrentTurnName(data.currentTurnName || '');
       setPlayers(data.players || []);
       setWinnerName(null);
+      setNotice('');
     });
 
     socket.on('number_called', (data) => {
@@ -75,6 +77,30 @@ export default function Gameroom({ room, playerName }) {
       setWinnerName(data.winnerName || null);
     });
 
+    socket.on('room_reset', (data) => {
+      // Back to waiting screen; App will update `room` prop too
+      setBoard([]);
+      setMarkedNumbers([]);
+      setCalledNumbers([]);
+      setCalledNumbersWithCaller([]);
+      setCurrentTurn(null);
+      setCurrentTurnName('');
+      setPlayers(data?.players || []);
+      setWinnerName(null);
+      setGameError('');
+      setNotice('New game ready. Waiting for host to start.');
+    });
+
+    socket.on('player_left', ({ room: updatedRoom, playerName: leftName }) => {
+      if (updatedRoom?.players) {
+        setPlayers(updatedRoom.players.map(p => ({ id: p.id, name: p.name })));
+      }
+      if (leftName) {
+        setNotice(`${leftName} disconnected.`);
+        setTimeout(() => setNotice(''), 4000);
+      }
+    });
+
     socket.on('game_error', (msg) => {
       setGameError(msg);
     });
@@ -84,6 +110,8 @@ export default function Gameroom({ room, playerName }) {
       socket.off('number_called');
       socket.off('turn_skipped');
       socket.off('game_over');
+      socket.off('room_reset');
+      socket.off('player_left');
       socket.off('game_error');
     };
   }, [socket, room, myId]);
@@ -162,6 +190,12 @@ export default function Gameroom({ room, playerName }) {
       <div className="gameroom-winner">
         <h1>Game Over</h1>
         <p>{winnerName} wins!</p>
+        <button
+          className="play-again-button"
+          onClick={() => room?.roomCode && socket.emit('play_again', room.roomCode)}
+        >
+          Play Again
+        </button>
       </div>
     );
   }
@@ -190,6 +224,7 @@ export default function Gameroom({ room, playerName }) {
         </div>
         <div className="line-count">Lines: {lines}/5</div>
       </div>
+      {notice && <div className="notice-banner">{notice}</div>}
       {gameError && <p className="lobby-error">{gameError}</p>}
       <div className="gameroom-main">
         <div className="gameroom-left">
