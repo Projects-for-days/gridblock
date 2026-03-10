@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const roomHandler = require('./roomHandler');
+const gameHandler = require('./gameHandler');
 
 const app = express();
 app.use(cors());
@@ -25,6 +26,7 @@ io.on('connection', (socket) => {
   console.log(`Player connected: ${socket.id}`);
   // Pass io and socket to roomHandler to handle all room events
   roomHandler(io, socket);
+  gameHandler(io, socket);
 });
 
 const PORT = 4000;

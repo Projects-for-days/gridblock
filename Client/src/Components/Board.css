@@ -16,6 +16,10 @@
 }
 
 .cell.clicked {
-  color: red;
-  background-color: #ffe0e0;
+  font-weight: bold;
+}
+
+.cell.completed-line {
+  font-weight: bold;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.3);
 }

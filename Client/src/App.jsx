@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Lobby from './Components/Lobby';
-import Board from './Components/Board';
-import Timer from './Components/Timer';
+import GameRoom from './Components/Gameroom';
+import { useSocket } from './Context/SocketContext';
 import './App.css';
 
 function App() {
+  const { socket } = useSocket();
   const [room, setRoom] = useState(null);
   const [playerName, setPlayerName] = useState('');
 
@@ -13,20 +14,24 @@ function App() {
     setPlayerName(name);
   }
 
-  // If no room yet, show the lobby
+  // When someone joins our room, update room state so host sees updated player list and can start
+  useEffect(() => {
+    if (!socket || !room) return;
+    socket.on('player_joined', (updatedRoom) => {
+      setRoom(updatedRoom);
+    });
+    return () => socket.off('player_joined');
+  }, [socket, room]);
+
   if (!room) {
     return <Lobby onRoomReady={handleRoomReady} />;
   }
 
-  // Once in a room, show the game
   return (
-    <div className="app">
-      <h1>GridBlock</h1>
-      <p>Room: <strong>{room.roomCode}</strong></p>
-      <p>Players: {room.players.map(p => p.name).join(', ')}</p>
-      <Board />
-      <Timer />
-    </div>
+    <GameRoom
+      room={room}
+      playerName={playerName}
+    />
   );
 }
 

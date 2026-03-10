@@ -1,0 +1,225 @@
+.gameroom {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.gameroom-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-top: 24px;
+  overflow: visible;
+}
+
+.gameroom-header h1 {
+  position: static;
+  transform: none;
+  left: auto;
+  font-size: 36px;
+  margin: 0 0 8px 0;
+  line-height: 1.25;
+  padding: 0;
+}
+
+.turn-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 4px 0;
+}
+
+.turn-indicator-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.line-count {
+  font-size: 16px;
+  color: #555;
+}
+
+.gameroom-main {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.gameroom-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.gameroom-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 200px;
+}
+
+/* Board cells during gameplay */
+.cell.not-your-turn {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.cell.already-called {
+  background-color: #e0e0e0;
+  cursor: default;
+}
+
+/* Called numbers list */
+.called-numbers {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.called-numbers h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.called-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.called-chip {
+  background: #1a1a2e;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.no-calls {
+  color: #aaa;
+  font-size: 14px;
+}
+
+/* Players panel */
+.players-panel {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.players-panel h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  margin: 4px -12px;
+  border-radius: 8px;
+  border-left: 4px solid transparent;
+  font-size: 15px;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.player-row.active-turn {
+  font-weight: bold;
+  color: #1a1a2e;
+}
+
+.player-row-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Waiting room */
+.gameroom-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f5f5f5;
+  font-family: Arial, sans-serif;
+}
+
+.waiting-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  text-align: center;
+  min-width: 300px;
+}
+
+.room-code {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.players-list {
+  margin: 20px 0;
+}
+
+.player-tag {
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin: 6px auto;
+  display: inline-block;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.start-button {
+  background: #1a1a2e;
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.start-button:hover {
+  opacity: 0.85;
+}
+
+.waiting-text {
+  color: #888;
+  font-size: 15px;
+  margin-top: 10px;
+}
+
+/* Winner screen */
+.gameroom-winner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.gameroom-winner h1 {
+  font-size: 52px;
+  margin-bottom: 16px;
+}

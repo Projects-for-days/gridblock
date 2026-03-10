@@ -1,37 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import './Timer.css';
 
-function Timer() {
-  const [timeLeft, setTimeLeft] = useState(null);
-  const [running, setRunning] = useState(false);
+function Timer({ isMyTurn, currentTurn, onTimeout }) {
+  const [timeLeft, setTimeLeft] = useState(30);
 
+  // Reset timer every time the turn changes
   useEffect(() => {
-    if (!running) return;
+    setTimeLeft(30);
+  }, [currentTurn]);
+
+  // Count down only when it's your turn
+  useEffect(() => {
+    if (!isMyTurn) return;
     if (timeLeft <= 0) {
-      setRunning(false);
+      onTimeout();
       return;
     }
     const interval = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+      setTimeLeft(prev => prev - 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, [running, timeLeft]);
-
-  function startTurn() {
-    setTimeLeft(30);
-    setRunning(true);
-  }
-
-  function getButtonLabel() {
-    if (timeLeft === null) return 'Start Turn';
-    if (timeLeft <= 0) return 'Turn Over!';
-    return `Time: ${timeLeft}s`;
-  }
+  }, [isMyTurn, timeLeft, onTimeout]);
 
   return (
     <div id="timer">
-      <button id="timer-button" onClick={startTurn}>
-        {getButtonLabel()}
+      <button
+        id="timer-button"
+        style={{ backgroundColor: timeLeft <= 10 ? '#ffdddd' : '#f0f0f0' }}
+      >
+        {isMyTurn
+          ? `Your turn: ${timeLeft}s`
+          : `Next turn: ${timeLeft}s`}
       </button>
     </div>
   );

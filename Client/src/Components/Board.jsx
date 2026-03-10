@@ -1,36 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './Board.css';
 
-function generateShuffledBoard() {
-  let numbers = [];
-  for (let i = 1; i <= 25; i++) {
-    numbers.push(i);
-  }
-  for (let i = numbers.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
-  }
-  return numbers;
-}
-
-function Board() {
-  const [numbers] = useState(generateShuffledBoard);
-  const [marked, setMarked] = useState([]);
-
-  function handleCellClick(num) {
-    if (marked.includes(num)) return;
-    setMarked([...marked, num]);
-  }
+function Board({ board, markedNumbers, calledNumbers, markedNumberColors = {}, completedLineNumbers = new Set(), isMyTurn, onNumberClick }) {
+  const completedSet = completedLineNumbers instanceof Set ? completedLineNumbers : new Set(completedLineNumbers);
 
   return (
     <div id="board">
-      {numbers.map((num) => {
-        const isMarked = marked.includes(num);
+      {board.map((num, index) => {
+        const isMarked = markedNumbers.includes(num);
+        const isCalled = calledNumbers.includes(num);
+        const isInCompletedLine = completedSet.has(num);
+        const cellColor = isMarked ? (markedNumberColors[num] || '#333') : null;
+
         return (
           <div
-            key={num}
-            className={`cell ${isMarked ? 'clicked' : ''}`}
-            onClick={() => handleCellClick(num)}
+            key={index}
+            className={`cell 
+              ${isMarked ? 'clicked' : ''} 
+              ${isInCompletedLine ? 'completed-line' : ''}
+              ${isCalled && !isMarked ? 'already-called' : ''}
+              ${!isMyTurn ? 'not-your-turn' : ''}
+            `}
+            style={
+              isInCompletedLine
+                ? {
+                    backgroundColor: '#1a1a2e',
+                    color: '#fff',
+                    borderColor: '#1a1a2e',
+                    borderWidth: '2px',
+                  }
+                : cellColor
+                ? {
+                    color: cellColor,
+                    backgroundColor: `${cellColor}18`,
+                    borderColor: `${cellColor}99`,
+                  }
+                : undefined
+            }
+            onClick={() => onNumberClick(num)}
           >
             {isMarked ? 'X' : num}
           </div>
