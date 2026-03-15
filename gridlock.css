@@ -1,0 +1,99 @@
+body{
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; 
+    flex-direction: column;
+    background-color: #1a1f1c;
+    font-family: Doto;
+
+}
+#left{
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    background-color: #1a1f1c;
+    border-right: 1px solid green;
+    width: 20%;
+
+} 
+#start{
+    display: inline-block;
+    font-size: 2.5em;
+    position: absolute;
+    top: -40px;
+    left: 40px;
+    color: white;
+}
+
+#end{
+    display: inline-block;
+    position: absolute;
+    font-size: 2.5em;
+    top: -5px;
+    left: 115px;
+    color:aquamarine;
+}
+
+#right{
+    height: 100%;
+    background-color: #1a1f1c;
+    border-left: 1px solid green;
+    width: 20%;
+
+}
+#top{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10vh;
+    width: 100%;
+    background-color: #1a1f1c;
+    z-index: 2;
+    border-bottom: 1px solid green;
+}
+
+#back{
+    display: flex;
+    background-color: #0b0f0d;
+    flex: 1;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    align-items: center;
+    justify-content: space-between;
+}
+
+#board{
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    gap: 5px;
+
+
+}
+
+#timer-button{
+    width: 70px;
+    height: 70px;
+    background-image: url('timerpic.png');
+    background-size: cover;
+    background-position: center;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+#board div {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid green;
+    border-radius: 6px;
+    background-color: #1a1f1c;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
