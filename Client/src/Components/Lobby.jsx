@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useSocket } from '../Context/SocketContext';
 import './Lobby.css';
 
-function Lobby({ onRoomReady }) {
+function Lobby({ onRoomReady, colorTheme, onThemeChange, darkMode, onDarkModeChange }) {
   const { socket, connected, connectionError } = useSocket();
   const [playerName, setPlayerName] = useState('');
   const [roomCode, setRoomCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [customColor, setCustomColor] = useState('#00ff88');
 
   useEffect(() => {
     if (!socket) return;
@@ -85,9 +87,124 @@ function Lobby({ onRoomReady }) {
     }
   };
 
+  const handleCustomColorChange = (color) => {
+    setCustomColor(color);
+    onThemeChange(color); // Pass the hex color directly
+  };
+
+  // Preset themes - only 4
+  const presetThemes = [
+    { name: 'green', color: '#00ff88', label: 'Matrix Green' },
+    { name: 'blue', color: '#00d4ff', label: 'Cyber Blue' },
+    { name: 'purple', color: '#b84dff', label: 'Neon Purple' },
+    { name: 'pink', color: '#ff4d9e', label: 'Hot Pink' },
+  ];
+
+  const isCustomColor = !presetThemes.some(theme => theme.name === colorTheme);
+
   return (
     <div className="lobby">
       <div className="lobby-background">
+        <button 
+          className="settings-button"
+          onClick={() => setShowSettings(!showSettings)}
+          title="Settings"
+        >
+          ⚙️
+        </button>
+
+        {showSettings && (
+          <div className="settings-modal" onClick={() => setShowSettings(false)}>
+            <div className="settings-content" onClick={(e) => e.stopPropagation()}>
+              <div className="settings-header">
+                <h3>⚙️ Settings</h3>
+                <button 
+                  className="close-settings"
+                  onClick={() => setShowSettings(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="settings-body">
+                {/* Dark/Light Mode Toggle */}
+                <div className="settings-section">
+                  <h4>🌓 Display Mode</h4>
+                  <div className="mode-toggle">
+                    <button
+                      className={`mode-btn ${darkMode ? 'active' : ''}`}
+                      onClick={() => onDarkModeChange(true)}
+                    >
+                      🌙 Dark Mode
+                    </button>
+                    <button
+                      className={`mode-btn ${!darkMode ? 'active' : ''}`}
+                      onClick={() => onDarkModeChange(false)}
+                    >
+                      ☀️ Light Mode
+                    </button>
+                  </div>
+                </div>
+
+                {/* Color Theme - Presets */}
+                <div className="settings-section">
+                  <h4>🎨 Color Theme - Presets</h4>
+                  <div className="preset-grid">
+                    {presetThemes.map(theme => (
+                      <button
+                        key={theme.name}
+                        className={`theme-option ${colorTheme === theme.name ? 'active' : ''}`}
+                        onClick={() => onThemeChange(theme.name)}
+                        style={{
+                          borderColor: theme.color,
+                          background: colorTheme === theme.name 
+                            ? `linear-gradient(135deg, ${theme.color}22, ${theme.color}11)`
+                            : 'transparent'
+                        }}
+                      >
+                        <div 
+                          className="theme-color-preview"
+                          style={{ background: theme.color }}
+                        />
+                        <span>{theme.label}</span>
+                        {colorTheme === theme.name && <span className="check">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Color Picker */}
+                <div className="settings-section">
+                  <h4>🎨 Custom Color</h4>
+                  <div className="color-picker-section">
+                    <div className="color-picker-container">
+                      <input
+                        type="color"
+                        id="colorPicker"
+                        className="color-picker-input"
+                        value={isCustomColor ? colorTheme : customColor}
+                        onChange={(e) => handleCustomColorChange(e.target.value)}
+                      />
+                      <label htmlFor="colorPicker" className="color-picker-label">
+                        <div 
+                          className="color-preview-large"
+                          style={{ 
+                            background: isCustomColor ? colorTheme : customColor 
+                          }}
+                        />
+                        <span>Pick Your Color</span>
+                      </label>
+                    </div>
+                    <div className="color-hex-display">
+                      {isCustomColor ? colorTheme : customColor}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="lobby-card">
           <div className="lobby-header">
             <h1 className="lobby-title">

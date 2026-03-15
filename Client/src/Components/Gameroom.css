@@ -1,7 +1,7 @@
-.game-room {
+﻿.game-room {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0f0d 0%, #1a1f1c 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  color: var(--text-primary);
   font-family: 'Doto', sans-serif;
 }
 
@@ -10,8 +10,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 40px;
-  border-bottom: 2px solid #00ff88;
-  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid var(--primary-color);
+  background: var(--bg-input);
 }
 
 .header-left {
@@ -26,16 +26,24 @@
   font-weight: 900;
 }
 
+.title-grid {
+  color: var(--text-primary);
+}
+
+.title-block {
+  color: var(--primary-color);
+}
+
 .room-code {
-  color: #7dd3ae;
+  color: var(--primary-light);
   font-size: 0.9em;
 }
 
 .code {
-  color: #00ff88;
+  color: var(--primary-color);
   font-weight: 700;
   letter-spacing: 2px;
-  background: rgba(0, 255, 136, 0.1);
+  background: var(--bg-input);
   padding: 5px 15px;
   border-radius: 5px;
 }
@@ -67,8 +75,8 @@
 
 /* Sidebars */
 .sidebar {
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid #00ff88;
+  background: var(--bg-card);
+  border: 2px solid var(--primary-color);
   border-radius: 15px;
   padding: 20px;
   display: flex;
@@ -78,11 +86,11 @@
 
 .sidebar h3 {
   margin: 0;
-  color: #00ff88;
+  color: var(--primary-color);
   font-size: 1.2em;
   text-align: center;
   padding-bottom: 10px;
-  border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+  border-bottom: 2px solid var(--border-color);
 }
 
 /* Players List */
@@ -94,16 +102,18 @@
 }
 
 .player-card {
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(0, 255, 136, 0.3);
+  background: var(--bg-input);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   padding: 12px;
   transition: all 0.3s ease;
 }
 
 .player-card.current-player {
-  border-color: #00ff88;
-  background: rgba(0, 255, 136, 0.1);
+  border-color: var(--primary-color);
+  background: linear-gradient(135deg, 
+    var(--primary-color)11, 
+    var(--primary-color)05);
 }
 
 .player-card.active-turn {
@@ -129,23 +139,29 @@
 
 .player-name {
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
   font-size: 0.95em;
 }
 
 .player-score {
-  color: #7dd3ae;
+  color: var(--primary-light);
   font-size: 0.85em;
 }
 
+.player-lines {
+  color: var(--primary-light);
+  font-size: 0.85em;
+  margin-top: 3px;
+}
+
 .ready-status {
-  color: #999;
+  color: var(--text-secondary);
   font-size: 0.85em;
   margin-top: 5px;
 }
 
 .ready-status.ready {
-  color: #00ff88;
+  color: var(--primary-color);
   font-weight: 700;
 }
 
@@ -158,9 +174,9 @@
 
 .ready-btn {
   padding: 12px;
-  background: rgba(0, 255, 136, 0.1);
-  border: 2px solid #00ff88;
-  color: #00ff88;
+  background: var(--bg-input);
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
   border-radius: 8px;
   cursor: pointer;
   font-family: 'Doto', sans-serif;
@@ -169,20 +185,22 @@
 }
 
 .ready-btn:hover {
-  background: rgba(0, 255, 136, 0.2);
+  background: linear-gradient(135deg, 
+    var(--primary-color)22, 
+    var(--primary-color)11);
 }
 
 .ready-btn.ready {
-  background: linear-gradient(135deg, #00ff88 0%, #00cc6f 100%);
-  color: #0a0f0d;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: var(--bg-primary);
 }
 
 .waiting-message {
   text-align: center;
-  color: #7dd3ae;
+  color: var(--primary-light);
   font-size: 0.9em;
   padding: 15px;
-  background: rgba(0, 255, 136, 0.05);
+  background: var(--bg-input);
   border-radius: 8px;
 }
 
@@ -204,8 +222,8 @@
 .status-waiting,
 .status-winner,
 .status-playing {
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid #00ff88;
+  background: var(--bg-card);
+  border: 2px solid var(--primary-color);
   border-radius: 15px;
   padding: 30px;
 }
@@ -213,22 +231,22 @@
 .status-waiting h2,
 .status-winner h2 {
   margin: 0 0 10px 0;
-  color: #00ff88;
+  color: var(--primary-color);
   font-size: 2em;
 }
 
 .status-waiting p,
 .status-winner p {
   margin: 0;
-  color: #7dd3ae;
+  color: var(--primary-light);
   font-size: 1.1em;
 }
 
 .reset-btn {
   margin-top: 20px;
   padding: 12px 30px;
-  background: linear-gradient(135deg, #00ff88 0%, #00cc6f 100%);
-  color: #0a0f0d;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: var(--bg-primary);
   border: none;
   border-radius: 8px;
   font-family: 'Doto', sans-serif;
@@ -240,7 +258,7 @@
 
 .reset-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 5px 20px var(--primary-glow);
 }
 
 .turn-info {
@@ -252,7 +270,7 @@
 
 .turn-info h3 {
   margin: 0;
-  color: #00ff88;
+  color: var(--primary-color);
   font-size: 1.5em;
 }
 
@@ -267,7 +285,7 @@
 }
 
 .lines-counter {
-  color: #7dd3ae;
+  color: var(--primary-light);
   font-size: 1.2em;
   font-weight: 600;
 }
@@ -275,19 +293,19 @@
 .called-numbers {
   width: 100%;
   max-width: 600px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(0, 255, 136, 0.3);
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   padding: 20px;
 }
 
 .called-numbers h4 {
   margin: 0 0 10px 0;
-  color: #00ff88;
+  color: var(--primary-color);
 }
 
 .numbers-list {
-  color: #7dd3ae;
+  color: var(--primary-light);
   font-size: 1em;
   line-height: 1.6;
 }
@@ -307,20 +325,20 @@
 }
 
 .chat-message {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--bg-input);
   padding: 10px;
   border-radius: 8px;
-  border-left: 3px solid #00ff88;
+  border-left: 3px solid var(--primary-color);
 }
 
 .chat-name {
-  color: #00ff88;
+  color: var(--primary-color);
   font-weight: 700;
   margin-right: 8px;
 }
 
 .chat-text {
-  color: #7dd3ae;
+  color: var(--text-primary);
 }
 
 .chat-input {
@@ -331,22 +349,26 @@
 .chat-input input {
   flex: 1;
   padding: 10px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(0, 255, 136, 0.3);
+  background: var(--bg-input);
+  border: 2px solid var(--border-color);
   border-radius: 8px;
-  color: white;
+  color: var(--text-primary);
   font-family: 'Doto', sans-serif;
 }
 
 .chat-input input:focus {
   outline: none;
-  border-color: #00ff88;
+  border-color: var(--primary-color);
+}
+
+.chat-input input::placeholder {
+  color: var(--text-secondary);
 }
 
 .chat-input button {
   padding: 10px 15px;
-  background: #00ff88;
-  color: #0a0f0d;
+  background: var(--primary-color);
+  color: var(--bg-primary);
   border: none;
   border-radius: 8px;
   font-family: 'Doto', sans-serif;
@@ -356,7 +378,7 @@
 }
 
 .chat-input button:hover {
-  background: #00cc6f;
+  background: var(--primary-dark);
 }
 
 /* Responsive */
@@ -369,4 +391,15 @@
   .sidebar {
     max-height: none;
   }
+}
+
+/* Player Color Indicator */
+.player-color-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: 2px solid var(--border-color);
+  vertical-align: middle;
 }

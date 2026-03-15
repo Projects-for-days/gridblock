@@ -146,9 +146,9 @@ function generateThemeFromColor(hexColor) {
   
   return {
     primary: hexColor,
-    primaryDark: 'rgb(' + darkerR + ', ' + darkerG + ', ' + darkerB + ')',
-    primaryLight: 'rgb(' + lighterR + ', ' + lighterG + ', ' + lighterB + ')',
-    primaryGlow: 'rgba(' + r + ', ' + g + ', ' + b + ', 0.4)',
+    primaryDark: gb(, , ),
+    primaryLight: gb(, , ),
+    primaryGlow: gba(, , , 0.4),
   };
 }
 

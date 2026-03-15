@@ -1,14 +1,6 @@
 ﻿// This object stores all active game rooms with complete game state
 const rooms = {};
 
-// Player color palette
-const PLAYER_COLORS = [
-  '#00ff88', // Green
-  '#00d4ff', // Cyan
-  '#ff4d9e', // Pink
-  '#b84dff', // Purple
-];
-
 function generateRoomCode() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = '';
@@ -45,16 +37,14 @@ function createRoom(playerName, socketId) {
       score: 0,
       ready: false,
       board: generateBoard(boardSize),
-      marked: Array(boardSize * boardSize).fill(false),
-      color: PLAYER_COLORS[0]
+      marked: Array(boardSize * boardSize).fill(false)
     }],
     gameState: {
       started: false,
       calledNumbers: [],
-      numberCallers: {},
       currentTurn: null,
       turnTimeLeft: 30,
-      winners: null,
+      winners: null, // Changed to support ranking
       boardSize: boardSize
     },
     settings: {
@@ -64,7 +54,7 @@ function createRoom(playerName, socketId) {
     createdAt: Date.now()
   };
   
-  console.log(`✨ Room ${roomCode} created`);
+  console.log(\✨ Room \ created\);
   return rooms[roomCode];
 }
 
@@ -88,19 +78,16 @@ function joinRoom(roomCode, playerName, socketId) {
   }
   
   const boardSize = room.gameState.boardSize;
-  const playerColor = PLAYER_COLORS[room.players.length % PLAYER_COLORS.length];
-  
   room.players.push({ 
     id: socketId, 
     name: playerName,
     score: 0,
     ready: false,
     board: generateBoard(boardSize),
-    marked: Array(boardSize * boardSize).fill(false),
-    color: playerColor
+    marked: Array(boardSize * boardSize).fill(false)
   });
   
-  console.log(`👤 ${playerName} joined room ${roomCode}`);
+  console.log(\👤 \ joined room \\);
   return room;
 }
 
@@ -113,7 +100,7 @@ function leaveRoom(socketId) {
       const playerName = room.players[playerIndex].name;
       room.players.splice(playerIndex, 1);
       
-      console.log(`👋 ${playerName} left room ${code}`);
+      console.log(\👋 \ left room \\);
       
       if (room.gameState.started && room.gameState.currentTurn === socketId) {
         if (room.players.length > 0) {
@@ -123,7 +110,7 @@ function leaveRoom(socketId) {
       
       if (room.players.length === 0) {
         delete rooms[code];
-        console.log(`🗑️  Room ${code} deleted (empty)`);
+        console.log(\🗑️  Room \ deleted (empty)\);
       }
       
       return { roomCode: code, room: rooms[code] };
@@ -162,13 +149,12 @@ function startGame(roomCode) {
   });
   
   room.gameState.calledNumbers = [];
-  room.gameState.numberCallers = {};
   room.gameState.started = true;
   room.gameState.currentTurn = room.players[0].id;
   room.gameState.turnTimeLeft = room.settings.turnTime;
   room.gameState.winners = null;
   
-  console.log(`🎮 Game started in room ${roomCode}`);
+  console.log(\🎮 Game started in room \\);
   return room;
 }
 
@@ -184,8 +170,8 @@ function makeMove(roomCode, socketId, number) {
   }
   
   room.gameState.calledNumbers.push(number);
-  room.gameState.numberCallers[number] = socketId;
   
+  // Mark the number on ALL players' boards
   room.players.forEach(player => {
     const index = player.board.indexOf(number);
     if (index !== -1) {
@@ -193,6 +179,7 @@ function makeMove(roomCode, socketId, number) {
     }
   });
   
+  // Check who has 5 or more lines
   const playersWithFiveLines = [];
   for (const player of room.players) {
     const lines = countCompletedLines(player.marked, room.gameState.boardSize);
@@ -205,10 +192,12 @@ function makeMove(roomCode, socketId, number) {
     }
   }
   
+  // Determine winners and ranking
   if (playersWithFiveLines.length > 0) {
     let winners;
     
     if (playersWithFiveLines.length === 1) {
+      // Only one winner - they win regardless of turn
       winners = [{
         playerId: playersWithFiveLines[0].id,
         playerName: playersWithFiveLines[0].name,
@@ -219,10 +208,12 @@ function makeMove(roomCode, socketId, number) {
       const winnerPlayer = room.players.find(p => p.id === playersWithFiveLines[0].id);
       if (winnerPlayer) winnerPlayer.score += 1;
       
-      console.log(`🏆 ${playersWithFiveLines[0].name} won in room ${roomCode}!`);
+      console.log(\🏆 \ won in room \!\);
     } else {
+      // Multiple people reached 5 lines - rank by turn order
       winners = [];
       
+      // Current turn player gets 1st
       const currentTurnWinner = playersWithFiveLines.find(p => p.id === socketId);
       if (currentTurnWinner) {
         winners.push({
@@ -236,6 +227,7 @@ function makeMove(roomCode, socketId, number) {
         if (winnerPlayer) winnerPlayer.score += 1;
       }
       
+      // Rank others by turn order
       const currentPlayerIndex = room.players.findIndex(p => p.id === socketId);
       let rank = 2;
       
@@ -255,13 +247,14 @@ function makeMove(roomCode, socketId, number) {
         }
       }
       
-      console.log(`🏆 Multiple winners in room ${roomCode}:`, winners);
+      console.log(\🏆 Multiple winners in room \:\, winners);
     }
     
     room.gameState.winners = winners;
     return { room, winners };
   }
   
+  // No winner yet - move to next player
   const currentIndex = room.players.findIndex(p => p.id === socketId);
   const nextIndex = (currentIndex + 1) % room.players.length;
   room.gameState.currentTurn = room.players[nextIndex].id;
@@ -328,12 +321,11 @@ function resetGame(roomCode) {
   });
   
   room.gameState.calledNumbers = [];
-  room.gameState.numberCallers = {};
   room.gameState.started = false;
   room.gameState.currentTurn = null;
   room.gameState.winners = null;
   
-  console.log(`🔄 Game reset in room ${roomCode}`);
+  console.log(\🔄 Game reset in room \\);
   return room;
 }
 
