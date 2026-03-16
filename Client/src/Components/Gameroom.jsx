@@ -85,19 +85,16 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
     if (!room.gameState.started) return;
     if (room.gameState.currentTurn !== socket.id) return;
     if (room.gameState.winners) return;
-    
-    // Get current player's board
+
     const currentPlayer = room.players.find(p => p.id === socket.id);
     if (!currentPlayer) return;
-    
+
     if (currentPlayer.marked[index]) return;
-    
-    // Get the number at this position on YOUR board
+
     const number = currentPlayer.board[index];
-    
-    // Send the NUMBER (not the index) to the server
-    socket.emit('make_move', { 
-      roomCode: room.roomCode, 
+
+    socket.emit('make_move', {
+      roomCode: room.roomCode,
       number: number
     });
   };
@@ -117,17 +114,20 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
     }
   };
 
-  // Get YOUR player data
   const currentPlayer = room.players.find(p => p.id === socket.id);
   const isMyTurn = room.gameState.currentTurn === socket.id;
   const currentTurnPlayer = room.players.find(p => p.id === room.gameState.currentTurn);
-  
-  // Calculate lines for YOUR board
   const myLines = currentPlayer ? countLines(currentPlayer.marked, room.gameState.boardSize) : 0;
+
+  const getWinnerName = () => {
+    const w = room.gameState.winners;
+    if (!w) return null;
+    if (Array.isArray(w)) return w[0]?.playerName || 'Unknown';
+    return room.players.find(p => p.id === w)?.name || 'Unknown';
+  };
 
   return (
     <div className="game-room">
-      {/* Header */}
       <div className="game-header">
         <div className="header-left">
           <h1 className="game-title">
@@ -139,26 +139,22 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
           </div>
         </div>
         <button className="leave-btn" onClick={onLeave}>
-            Leave Room
-          </button>
+          Leave Room
+        </button>
         <button className="help-btn" onClick={() => setShowRules(true)} title="How to Play">
           ?
         </button>
-          <button className="help-btn" onClick={() => setShowRules(true)} title="How to Play">
-            ?
-          </button>
       </div>
 
       <div className="game-container">
-        {/* Left Sidebar - Players */}
         <div className="sidebar sidebar-left">
           <h3>Players ({room.players.length}/4)</h3>
           <div className="players-list">
             {room.players.map((player) => {
               const playerLines = countLines(player.marked, room.gameState.boardSize);
               return (
-                <div 
-                  key={player.id} 
+                <div
+                  key={player.id}
                   className={`player-card ${player.id === socket.id ? 'current-player' : ''} ${room.gameState.currentTurn === player.id ? 'active-turn' : ''}`}
                 >
                   <div className="player-info">
@@ -188,7 +184,7 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
           </div>
 
           {!room.gameState.started && (
-            <button 
+            <button
               className={`ready-btn ${currentPlayer?.ready ? 'ready' : ''}`}
               onClick={handleToggleReady}
             >
@@ -203,9 +199,7 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
           )}
         </div>
 
-        {/* Main Game Area */}
         <div className="game-main">
-          {/* Game Status */}
           <div className="game-status">
             {!room.gameState.started ? (
               <div className="status-waiting">
@@ -215,9 +209,7 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
             ) : room.gameState.winners ? (
               <div className="status-winner">
                 <h2>Game Over!</h2>
-                <p>
-                  {room.players.find(p => p.id === room.gameState.winners)?.name} wins!
-                </p>
+                <p>{getWinnerName()} wins!</p>
                 <button className="reset-btn" onClick={handleReset}>
                   Play Again
                 </button>
@@ -228,8 +220,7 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
                   <h3>
                     {isMyTurn ? "Your Turn!" : `${currentTurnPlayer?.name}'s Turn`}
                   </h3>
-                  <div className="timer">⏱️ {timeLeft}s
-                  </div>
+                  <div className="timer">⏱ {timeLeft}s</div>
                 </div>
                 <div className="lines-counter">
                   Your Lines: {myLines}/5
@@ -238,32 +229,30 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
             )}
           </div>
 
-          {/* Board - Shows YOUR unique board */}
           {currentPlayer && (
             <Board
-                board={currentPlayer.board}
-                marked={currentPlayer.marked}
-                boardSize={room.gameState.boardSize}
-                onCellClick={handleCellClick}
-                disabled={!isMyTurn || !room.gameState.started || !!room.gameState.winnerss}
-                room={room}
-                currentPlayerId={socket.id}
+              board={currentPlayer.board}
+              marked={currentPlayer.marked}
+              boardSize={room.gameState.boardSize}
+              onCellClick={handleCellClick}
+              disabled={!isMyTurn || !room.gameState.started || !!room.gameState.winners}
+              room={room}
+              currentPlayerId={socket.id}
             />
           )}
 
-          {/* Called Numbers */}
           {room.gameState.started && (
             <div className="called-numbers">
               <h4>Called Numbers:</h4>
               <div className="numbers-list">
-                {room.gameState.calledNumbers.length > 0 ? room.gameState.calledNumbers.join(', ')
+                {room.gameState.calledNumbers.length > 0
+                  ? room.gameState.calledNumbers.join(', ')
                   : 'None yet'}
               </div>
             </div>
           )}
         </div>
 
-        {/* Right Sidebar - Chat */}
         <div className="sidebar sidebar-right">
           <h3>Chat</h3>
           <div className="chat-messages">
@@ -287,31 +276,28 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
         </div>
       </div>
 
-      {/* How to Play Modal */}
       {showRules && (
         <div className="rules-modal-overlay" onClick={() => setShowRules(false)}>
           <div className="rules-modal" onClick={(e) => e.stopPropagation()}>
             <div className="rules-header">
               <h2>How to Play GridBlock</h2>
-              <button className="close-btn" onClick={() => setShowRules(false)}>×</button>
+              <button className="close-btn" onClick={() => setShowRules(false)}>x</button>
             </div>
             <div className="rules-content">
               <div className="rules-section">
                 <h3>Game Rules</h3>
                 <ul>
-                  <li>Players take turns marking cells on a 5×5 grid</li>
+                  <li>Players take turns marking cells on a 5x5 grid</li>
                   <li>Each cell contains a number from 0-24</li>
                   <li>On your turn, click any unmarked cell</li>
                   <li>You have 30 seconds to make your move</li>
                   <li>Complete 5 lines to win</li>
                 </ul>
               </div>
-              
               <div className="rules-section">
-                <h3>🏆 How to Win</h3>
+                <h3>How to Win</h3>
                 <p>Complete 5 lines (rows, columns, or diagonals)</p>
               </div>
-              
               <div className="rules-section">
                 <h3>Turn Timer</h3>
                 <p>30 seconds per turn</p>
@@ -323,39 +309,34 @@ function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
     </div>
   );
 }
-// Helper function to count lines
+
 function countLines(marked, size) {
   let count = 0;
-  
-  // Rows
+
   for (let row = 0; row < size; row++) {
     if (marked.slice(row * size, (row + 1) * size).every(m => m)) count++;
   }
-  
-  // Columns
+
   for (let col = 0; col < size; col++) {
     let complete = true;
     for (let row = 0; row < size; row++) {
-      if (!marked[row * size + col]) complete = false;
+      if (!marked[row * size + col]) { complete = false; break; }
     }
     if (complete) count++;
   }
-  
-  // Diagonal: top-left to bottom-right (indices: 0, 6, 12, 18, 24)
-  if (marked.filter((_, i) => i % (size + 1) === 0).every(m => m)) count++;
-  
-  // Diagonal: top-right to bottom-left (indices: 4, 8, 12, 16, 20)
-  // FIXED: Check only the actual diagonal cells
+
+  let diag1Complete = true;
+  for (let i = 0; i < size; i++) {
+    if (!marked[i * size + i]) { diag1Complete = false; break; }
+  }
+  if (diag1Complete) count++;
+
   let diag2Complete = true;
   for (let i = 0; i < size; i++) {
-    const index = i * size + (size - 1 - i);
-    if (!marked[index]) {
-      diag2Complete = false;
-      break;
-    }
+    if (!marked[i * size + (size - 1 - i)]) { diag2Complete = false; break; }
   }
   if (diag2Complete) count++;
-  
+
   return count;
 }
 
