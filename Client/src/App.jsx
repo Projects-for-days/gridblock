@@ -13,6 +13,9 @@ function App() {
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('gridblock-darkmode') !== 'false';
   });
+  const [volume, setVolume] = useState(() => {
+    return parseFloat(localStorage.getItem('gridblock-volume')) || 0.5;
+  });
 
   useEffect(() => {
     localStorage.setItem('gridblock-theme', colorTheme);
@@ -40,6 +43,8 @@ function App() {
             onThemeChange={setColorTheme}
             darkMode={darkMode}
             onDarkModeChange={setDarkMode}
+            volume={volume}
+            onVolumeChange={setVolume}
           />
         ) : (
           <GameRoom 
@@ -48,6 +53,7 @@ function App() {
             onLeave={handleLeaveRoom}
             colorTheme={colorTheme}
             darkMode={darkMode}
+            volume={volume}
           />
         )}
       </div>

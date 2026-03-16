@@ -126,7 +126,7 @@ function leaveRoom(socketId) {
         console.log(`🗑️  Room ${code} deleted (empty)`);
       }
       
-      return { roomCode: code, room: rooms[code] };
+      return { roomCode: code, room: rooms[code], playerName: playerName };
     }
   }
   return null;

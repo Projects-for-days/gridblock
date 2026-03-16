@@ -468,3 +468,66 @@
   border-radius: 8px;
   letter-spacing: 2px;
 }
+
+/* Volume Control */
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: var(--bg-input);
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+}
+
+.volume-slider {
+  flex: 1;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--primary-glow);
+  transition: all 0.3s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px var(--primary-glow);
+  transition: all 0.3s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.volume-label {
+  min-width: 45px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1.1em;
+}

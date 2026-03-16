@@ -10,6 +10,9 @@ function Lobby({ onRoomReady, colorTheme, onThemeChange, darkMode, onDarkModeCha
   const [loading, setLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [customColor, setCustomColor] = useState('#00ff88');
+  const [volume, setVolume] = useState(() => {
+    return parseFloat(localStorage.getItem('gridblock-volume')) || 0.5;
+  });
 
   useEffect(() => {
     if (!socket) return;
@@ -198,6 +201,25 @@ function Lobby({ onRoomReady, colorTheme, onThemeChange, darkMode, onDarkModeCha
                     <div className="color-hex-display">
                       {isCustomColor ? colorTheme : customColor}
                     </div>
+
+                {/* Volume Control */}
+                <div className="settings-section">
+                  <h4>🔊 Sound Volume</h4>
+                  <div className="volume-control">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={volume}
+                      onChange={(e) => setVolume(parseFloat(e.target.value))}
+                      className="volume-slider"
+                    />
+                    <div className="volume-label">
+                      {Math.round(volume * 100)}%
+                    </div>
+                  </div>
+                </div>
                   </div>
                 </div>
               </div>
@@ -216,13 +238,13 @@ function Lobby({ onRoomReady, colorTheme, onThemeChange, darkMode, onDarkModeCha
 
           {connectionError && (
             <div className="connection-error">
-              ⚠️ {connectionError}
+              {connectionError}
             </div>
           )}
 
           {!connected && (
             <div className="connection-status">
-              🔄 Connecting to server...
+              Connecting to server...
             </div>
           )}
 
@@ -241,14 +263,14 @@ function Lobby({ onRoomReady, colorTheme, onThemeChange, darkMode, onDarkModeCha
               />
             </div>
 
-            {error && <div className="lobby-error">❌ {error}</div>}
+            {error && <div className="lobby-error">{error}</div>}
 
             <button 
               className="lobby-btn lobby-btn-create"
               onClick={handleCreate}
               disabled={loading || !connected}
             >
-              {loading ? '⏳ Creating...' : '🎮 Create Room'}
+              {loading ? 'Creating...' : 'Create Room'}
             </button>
 
             <div className="lobby-divider">
@@ -274,11 +296,11 @@ function Lobby({ onRoomReady, colorTheme, onThemeChange, darkMode, onDarkModeCha
               onClick={handleJoin}
               disabled={loading || !connected}
             >
-              {loading ? '⏳ Joining...' : '🚪 Join Room'}
+              {loading ? 'Joining...' : 'Join Room'}
             </button>
 
             <div className="lobby-hint">
-              💡 Tip: Share the room code with friends to play together!
+              Tip: Share the room code with friends to play together!
             </div>
           </div>
         </div>
