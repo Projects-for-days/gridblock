@@ -2,7 +2,9 @@
   "buildCommand": "cd Client && npm install && npm run build",
   "outputDirectory": "Client/dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "env": {
-    "VITE_SOCKET_URL": "https://gridblock.onrender.com"
+  "build": {
+    "env": {
+      "VITE_SOCKET_URL": "https://gridblock.onrender.com"
+    }
   }
 }
