@@ -1,45 +1,43 @@
-import React from 'react';
+﻿import React from 'react';
 import './Board.css';
 
-function Board({ board, markedNumbers, calledNumbers, markedNumberColors = {}, completedLineNumbers = new Set(), isMyTurn, onNumberClick }) {
-  const completedSet = completedLineNumbers instanceof Set ? completedLineNumbers : new Set(completedLineNumbers);
-
+function Board({ board, marked, boardSize, onCellClick, disabled, room, currentPlayerId }) {
+  // Get who called each number
+  const numberCallers = room?.gameState?.numberCallers || {};
+  const players = room?.players || [];
+  
+  // Find the color for a given number
+  const getNumberColor = (number) => {
+    const callerId = numberCallers[number];
+    if (!callerId) return null;
+    
+    const caller = players.find(p => p.id === callerId);
+    return caller?.color || '#ff4444';
+  };
+  
   return (
-    <div id="board">
-      {board.map((num, index) => {
-        const isMarked = markedNumbers.includes(num);
-        const isCalled = calledNumbers.includes(num);
-        const isInCompletedLine = completedSet.has(num);
-        const cellColor = isMarked ? (markedNumberColors[num] || '#333') : null;
-
+    <div 
+      className='board-container'
+      style={{
+        gridTemplateColumns: 'repeat(' + boardSize + ', 1fr)'
+      }}
+    >
+      {board.map((number, index) => {
+        const isMarked = marked[index];
+        const callerColor = isMarked ? getNumberColor(number) : null;
+        
         return (
           <div
             key={index}
-            className={`cell 
-              ${isMarked ? 'clicked' : ''} 
-              ${isInCompletedLine ? 'completed-line' : ''}
-              ${isCalled && !isMarked ? 'already-called' : ''}
-              ${!isMyTurn ? 'not-your-turn' : ''}
-            `}
-            style={
-              isInCompletedLine
-                ? {
-                    backgroundColor: '#1a1a2e',
-                    color: '#fff',
-                    borderColor: '#1a1a2e',
-                    borderWidth: '2px',
-                  }
-                : cellColor
-                ? {
-                    color: cellColor,
-                    backgroundColor: `${cellColor}18`,
-                    borderColor: `${cellColor}99`,
-                  }
-                : undefined
-            }
-            onClick={() => onNumberClick(num)}
+            className={'board-cell ' + (isMarked ? 'marked ' : '') + (disabled ? 'disabled' : '')}
+            onClick={() => !disabled && !isMarked && onCellClick(index)}
+            style={isMarked && callerColor ? {
+              background: 'linear-gradient(135deg, ' + callerColor + ' 0%, ' + callerColor + 'cc 100%)',
+              borderColor: callerColor,
+              boxShadow: '0 0 10px ' + callerColor + '66'
+            } : {}}
           >
-            {isMarked ? 'X' : num}
+            {isMarked ? 'X' : number}
           </div>
         );
       })}

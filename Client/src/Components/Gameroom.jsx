@@ -1,286 +1,343 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Board from './Board';
-import Timer from './Timer';
+﻿import React, { useState, useEffect } from 'react';
 import { useSocket } from '../Context/SocketContext';
-import { countCompletedLines, getCompletedLineNumbers } from '../Utils/gamelogic';
+import Board from './Board';
 import './Gameroom.css';
 
-const PLAYER_COLORS = [
-  { bg: '#4a90d9', fg: '#fff', light: '#e8f2fc' },   // blue
-  { bg: '#d9534f', fg: '#fff', light: '#fce8e8' },   // red
-  { bg: '#5cb85c', fg: '#fff', light: '#e8f5e9' },   // green
-  { bg: '#f0ad4e', fg: '#fff', light: '#fff8e8' },   // amber
-];
-
-function getPlayerColor(index) {
-  return PLAYER_COLORS[index % PLAYER_COLORS.length];
-}
-
-export default function Gameroom({ room, playerName }) {
+function GameRoom({ room: initialRoom, playerName, onLeave, colorTheme }) {
   const { socket } = useSocket();
-  const [board, setBoard] = useState([]);
-  const [markedNumbers, setMarkedNumbers] = useState([]);
-  const [calledNumbers, setCalledNumbers] = useState([]);
-  const [currentTurn, setCurrentTurn] = useState(null);
-  const [currentTurnName, setCurrentTurnName] = useState('');
-  const [players, setPlayers] = useState([]);
-  const [gameError, setGameError] = useState('');
-  const [winnerName, setWinnerName] = useState(null);
-  const [calledNumbersWithCaller, setCalledNumbersWithCaller] = useState([]);
-  const [notice, setNotice] = useState('');
-
-  const myId = socket?.id;
-  const isMyTurn = currentTurn === myId;
-
-  // Win check: 5 completed lines
-  const lines = board.length ? countCompletedLines(markedNumbers, board) : 0;
-  const emitWinIfReady = useCallback(() => {
-    if (lines >= 5 && room?.roomCode) {
-      socket.emit('player_won', { roomCode: room.roomCode, playerName });
-    }
-  }, [lines, room?.roomCode, playerName, socket]);
+  const [room, setRoom] = useState(initialRoom);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [message, setMessage] = useState('');
+  const [chatMessages, setChatMessages] = useState([]);
+  const [showRules, setShowRules] = useState(false);
 
   useEffect(() => {
-    if (lines >= 5) emitWinIfReady();
-  }, [lines, emitWinIfReady]);
+    if (!socket) return;
 
-  useEffect(() => {
-    if (!socket || !room) return;
-
-    socket.on('game_started', (data) => {
-      setBoard(data.board);
-      setMarkedNumbers(data.markedNumbers || []);
-      setCalledNumbers(data.calledNumbers || []);
-      setCalledNumbersWithCaller(data.calledNumbersWithCaller || []);
-      setCurrentTurn(data.currentTurn);
-      setCurrentTurnName(data.currentTurnName || '');
-      setPlayers(data.players || []);
-      setWinnerName(null);
-      setNotice('');
+    socket.on('room_updated', (updatedRoom) => {
+      setRoom(updatedRoom);
     });
 
-    socket.on('number_called', (data) => {
-      setCalledNumbers(data.calledNumbers || []);
-      setCalledNumbersWithCaller(data.calledNumbersWithCaller || []);
-      setCurrentTurn(data.currentTurn);
-      setCurrentTurnName(data.currentTurnName || '');
-      const me = data.playerUpdates?.find(p => p.id === myId);
-      if (me) setMarkedNumbers(me.markedNumbers || []);
+    socket.on('game_started', (updatedRoom) => {
+      setRoom(updatedRoom);
+      setTimeLeft(updatedRoom.settings.turnTime);
     });
 
-    socket.on('turn_skipped', (data) => {
-      setCurrentTurn(data.currentTurn);
-      setCurrentTurnName(data.currentTurnName || '');
+    socket.on('move_made', ({ room: updatedRoom }) => {
+      setRoom(updatedRoom);
+      setTimeLeft(updatedRoom.settings.turnTime);
     });
 
-    socket.on('game_over', (data) => {
-      setWinnerName(data.winnerName || null);
+    socket.on('turn_timer_update', (time) => {
+      setTimeLeft(time);
     });
 
-    socket.on('room_reset', (data) => {
-      // Back to waiting screen; App will update `room` prop too
-      setBoard([]);
-      setMarkedNumbers([]);
-      setCalledNumbers([]);
-      setCalledNumbersWithCaller([]);
-      setCurrentTurn(null);
-      setCurrentTurnName('');
-      setPlayers(data?.players || []);
-      setWinnerName(null);
-      setGameError('');
-      setNotice('New game ready. Waiting for host to start.');
+    socket.on('turn_skipped', (updatedRoom) => {
+      setRoom(updatedRoom);
+      setTimeLeft(updatedRoom.settings.turnTime);
     });
 
-    socket.on('player_left', ({ room: updatedRoom, playerName: leftName }) => {
-      if (updatedRoom?.players) {
-        setPlayers(updatedRoom.players.map(p => ({ id: p.id, name: p.name })));
-      }
-      if (leftName) {
-        setNotice(`${leftName} disconnected.`);
-        setTimeout(() => setNotice(''), 4000);
-      }
+    socket.on('game_over', ({ winner, room: updatedRoom }) => {
+      setRoom(updatedRoom);
     });
 
-    socket.on('game_error', (msg) => {
-      setGameError(msg);
+    socket.on('game_reset', (updatedRoom) => {
+      setRoom(updatedRoom);
+      setTimeLeft(30);
+    });
+
+    socket.on('player_left', (updatedRoom) => {
+      setRoom(updatedRoom);
+    });
+
+    socket.on('chat_message', (msg) => {
+      setChatMessages(prev => [...prev, msg]);
+    });
+
+    socket.on('error', (error) => {
+      console.error('Game error:', error);
+    });
+
+    socket.on('move_error', (error) => {
+      console.error('Move error:', error);
     });
 
     return () => {
+      socket.off('room_updated');
       socket.off('game_started');
-      socket.off('number_called');
+      socket.off('move_made');
+      socket.off('turn_timer_update');
       socket.off('turn_skipped');
       socket.off('game_over');
-      socket.off('room_reset');
+      socket.off('game_reset');
       socket.off('player_left');
-      socket.off('game_error');
+      socket.off('chat_message');
+      socket.off('error');
+      socket.off('move_error');
     };
-  }, [socket, room, myId]);
+  }, [socket]);
 
-  function handleStartGame() {
-    setGameError('');
-    if (room?.roomCode) socket.emit('start_game', room.roomCode);
-  }
+  const handleToggleReady = () => {
+    socket.emit('toggle_ready', room.roomCode);
+  };
 
-  function handleNumberClick(num) {
-    setGameError('');
-    if (!room?.roomCode || !isMyTurn || calledNumbers.includes(num)) return;
-    socket.emit('call_number', { roomCode: room.roomCode, number: num });
-  }
+  const handleCellClick = (index) => {
+    if (!room.gameState.started) return;
+    if (room.gameState.currentTurn !== socket.id) return;
+    if (room.gameState.winners) return;
 
-  function handleTimeout() {
-    if (room?.roomCode) socket.emit('turn_timeout', room.roomCode);
-  }
+    const currentPlayer = room.players.find(p => p.id === socket.id);
+    if (!currentPlayer) return;
 
-  // Map each marked number to the color of the player who called it (for board X colors)
-  const markedNumberColors = useMemo(() => {
-    const map = {};
-    (calledNumbersWithCaller || []).forEach(({ number, calledBy }) => {
-      const idx = (players || []).findIndex(p => p.id === calledBy);
-      if (idx >= 0) map[number] = getPlayerColor(idx).bg;
+    if (currentPlayer.marked[index]) return;
+
+    const number = currentPlayer.board[index];
+
+    socket.emit('make_move', {
+      roomCode: room.roomCode,
+      number: number
     });
-    return map;
-  }, [calledNumbersWithCaller, players]);
+  };
 
-  // Numbers that form completed lines on this player's board (for uniform highlight)
-  const completedLineNumbers = useMemo(() => {
-    if (!board?.length) return new Set();
-    return getCompletedLineNumbers(markedNumbers, board);
-  }, [markedNumbers, board]);
+  const handleReset = () => {
+    socket.emit('reset_game', room.roomCode);
+  };
 
-  // Waiting for game to start (show waiting until we receive game_started and have board data)
-  if (board.length === 0) {
-    const isHost = room?.players?.[0]?.id === myId;
-    return (
-      <div className="gameroom-waiting">
-        <div className="waiting-card">
-          <div className="room-code">Room: {room?.roomCode}</div>
-          <div className="players-list">
-            {(room?.players || []).map((p, i) => {
-              const c = getPlayerColor(i);
-              return (
-                <div
-                  key={p.id}
-                  className="player-tag"
-                  style={{ backgroundColor: c.bg, color: c.fg }}
-                >
-                  {p.name}
-                </div>
-              );
-            })}
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (message.trim()) {
+      socket.emit('send_message', {
+        roomCode: room.roomCode,
+        message: message.trim()
+      });
+      setMessage('');
+    }
+  };
+
+  const currentPlayer = room.players.find(p => p.id === socket.id);
+  const isMyTurn = room.gameState.currentTurn === socket.id;
+  const currentTurnPlayer = room.players.find(p => p.id === room.gameState.currentTurn);
+  const myLines = currentPlayer ? countLines(currentPlayer.marked, room.gameState.boardSize) : 0;
+
+  const getWinnerName = () => {
+    const w = room.gameState.winners;
+    if (!w) return null;
+    if (Array.isArray(w)) return w[0]?.playerName || 'Unknown';
+    return room.players.find(p => p.id === w)?.name || 'Unknown';
+  };
+
+  return (
+    <div className="game-room">
+      <div className="game-header">
+        <div className="header-left">
+          <h1 className="game-title">
+            <span className="title-grid">Grid</span>
+            <span className="title-block">Block</span>
+          </h1>
+          <div className="room-code">
+            Room: <span className="code">{room.roomCode}</span>
           </div>
-          {room?.players?.length < 2 && (
-            <p className="waiting-text">Waiting for at least 2 players...</p>
-          )}
-          {isHost && room?.players?.length >= 2 && (
-            <button className="start-button" onClick={handleStartGame}>
-              Start Game
-            </button>
-          )}
-          {!isHost && room?.players?.length >= 2 && (
-            <p className="waiting-text">Waiting for host to start...</p>
-          )}
         </div>
-      </div>
-    );
-  }
-
-  // Winner screen
-  if (winnerName) {
-    return (
-      <div className="gameroom-winner">
-        <h1>Game Over</h1>
-        <p>{winnerName} wins!</p>
-        <button
-          className="play-again-button"
-          onClick={() => room?.roomCode && socket.emit('play_again', room.roomCode)}
-        >
-          Play Again
+        <button className="leave-btn" onClick={onLeave}>
+          Leave Room
+        </button>
+        <button className="help-btn" onClick={() => setShowRules(true)} title="How to Play">
+          ?
         </button>
       </div>
-    );
-  }
 
-  // In-game
-  return (
-    <div className="gameroom">
-      <div className="gameroom-header">
-        <h1>GridBlock</h1>
-        <div className="turn-indicator">
-          {(() => {
-            const turnIndex = players.findIndex(p => p.id === currentTurn);
-            const turnColor = turnIndex >= 0 ? getPlayerColor(turnIndex) : null;
-            return (
-              <>
-                {turnColor && (
-                  <span
-                    className="turn-indicator-dot"
-                    style={{ backgroundColor: turnColor.bg }}
-                  />
-                )}
-                {isMyTurn ? 'Your turn' : `${currentTurnName || 'Waiting'}...`}
-              </>
-            );
-          })()}
-        </div>
-        <div className="line-count">Lines: {lines}/5</div>
-      </div>
-      {notice && <div className="notice-banner">{notice}</div>}
-      {gameError && <p className="lobby-error">{gameError}</p>}
-      <div className="gameroom-main">
-        <div className="gameroom-left">
-          <Timer
-            isMyTurn={isMyTurn}
-            currentTurn={currentTurn}
-            onTimeout={handleTimeout}
-          />
-          <Board
-            board={board}
-            markedNumbers={markedNumbers}
-            calledNumbers={calledNumbers}
-            markedNumberColors={markedNumberColors}
-            completedLineNumbers={completedLineNumbers}
-            isMyTurn={isMyTurn}
-            onNumberClick={handleNumberClick}
-          />
-        </div>
-        <div className="gameroom-right">
-          <div className="players-panel">
-            <h3>Players</h3>
-            {(players || []).map((p, i) => {
-              const c = getPlayerColor(i);
-              const isActive = p.id === currentTurn;
+      <div className="game-container">
+        <div className="sidebar sidebar-left">
+          <h3>Players ({room.players.length}/4)</h3>
+          <div className="players-list">
+            {room.players.map((player) => {
+              const playerLines = countLines(player.marked, room.gameState.boardSize);
               return (
                 <div
-                  key={p.id}
-                  className={`player-row ${isActive ? 'active-turn' : ''}`}
-                  style={{
-                    borderLeftColor: c.bg,
-                    backgroundColor: isActive ? c.light : 'transparent',
-                  }}
+                  key={player.id}
+                  className={`player-card ${player.id === socket.id ? 'current-player' : ''} ${room.gameState.currentTurn === player.id ? 'active-turn' : ''}`}
                 >
-                  <span
-                    className="player-row-dot"
-                    style={{ backgroundColor: c.bg }}
-                  />
-                  {p.name}
+                  <div className="player-info">
+                    <span className="player-color-indicator" style={{ background: player.color, boxShadow: "0 0 8px " + player.color + "66" }} />
+                    <span className="player-name">
+                      {player.name}
+                      {player.id === socket.id && ' (You)'}
+                    </span>
+                    {room.gameState.started && (
+                      <>
+                        <span className="player-score">Score: {player.score}</span>
+                        <span className="player-lines">Lines: {playerLines}/5</span>
+                      </>
+                    )}
+                  </div>
+                  {!room.gameState.started && (
+                    <span className={`ready-status ${player.ready ? 'ready' : ''}`}>
+                      {player.ready ? 'Ready' : 'Not Ready'}
+                    </span>
+                  )}
+                  {room.gameState.currentTurn === player.id && room.gameState.started && (
+                    <span className="turn-indicator">Turn</span>
+                  )}
                 </div>
               );
             })}
           </div>
-          <div className="called-numbers">
-            <h3>Called Numbers</h3>
-            <div className="called-list">
-              {calledNumbers.length === 0 ? (
-                <span className="no-calls">None yet</span>
-              ) : (
-                calledNumbers.map(n => (
-                  <span key={n} className="called-chip">{n}</span>
-                ))
-              )}
+
+          {!room.gameState.started && (
+            <button
+              className={`ready-btn ${currentPlayer?.ready ? 'ready' : ''}`}
+              onClick={handleToggleReady}
+            >
+              {currentPlayer?.ready ? 'Ready!' : 'Mark as Ready'}
+            </button>
+          )}
+
+          {room.players.length < 2 && !room.gameState.started && (
+            <div className="waiting-message">
+              Waiting for more players...
+            </div>
+          )}
+        </div>
+
+        <div className="game-main">
+          <div className="game-status">
+            {!room.gameState.started ? (
+              <div className="status-waiting">
+                <h2>Waiting to Start</h2>
+                <p>All players must be ready to begin</p>
+              </div>
+            ) : room.gameState.winners ? (
+              <div className="status-winner">
+                <h2>Game Over!</h2>
+                <p>{getWinnerName()} wins!</p>
+                <button className="reset-btn" onClick={handleReset}>
+                  Play Again
+                </button>
+              </div>
+            ) : (
+              <div className="status-playing">
+                <div className="turn-info">
+                  <h3>
+                    {isMyTurn ? "Your Turn!" : `${currentTurnPlayer?.name}'s Turn`}
+                  </h3>
+                  <div className="timer">⏱ {timeLeft}s</div>
+                </div>
+                <div className="lines-counter">
+                  Your Lines: {myLines}/5
+                </div>
+              </div>
+            )}
+          </div>
+
+          {currentPlayer && (
+            <Board
+              board={currentPlayer.board}
+              marked={currentPlayer.marked}
+              boardSize={room.gameState.boardSize}
+              onCellClick={handleCellClick}
+              disabled={!isMyTurn || !room.gameState.started || !!room.gameState.winners}
+              room={room}
+              currentPlayerId={socket.id}
+            />
+          )}
+
+          {room.gameState.started && (
+            <div className="called-numbers">
+              <h4>Called Numbers:</h4>
+              <div className="numbers-list">
+                {room.gameState.calledNumbers.length > 0
+                  ? room.gameState.calledNumbers.join(', ')
+                  : 'None yet'}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="sidebar sidebar-right">
+          <h3>Chat</h3>
+          <div className="chat-messages">
+            {chatMessages.map((msg, idx) => (
+              <div key={idx} className="chat-message">
+                <span className="chat-name">{msg.playerName}:</span>
+                <span className="chat-text">{msg.message}</span>
+              </div>
+            ))}
+          </div>
+          <form className="chat-input" onSubmit={handleSendMessage}>
+            <input
+              type="text"
+              placeholder="Type a message..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              maxLength={100}
+            />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+
+      {showRules && (
+        <div className="rules-modal-overlay" onClick={() => setShowRules(false)}>
+          <div className="rules-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="rules-header">
+              <h2>How to Play GridBlock</h2>
+              <button className="close-btn" onClick={() => setShowRules(false)}>x</button>
+            </div>
+            <div className="rules-content">
+              <div className="rules-section">
+                <h3>Game Rules</h3>
+                <ul>
+                  <li>Players take turns marking cells on a 5x5 grid</li>
+                  <li>Each cell contains a number from 0-24</li>
+                  <li>On your turn, click any unmarked cell</li>
+                  <li>You have 30 seconds to make your move</li>
+                  <li>Complete 5 lines to win</li>
+                </ul>
+              </div>
+              <div className="rules-section">
+                <h3>How to Win</h3>
+                <p>Complete 5 lines (rows, columns, or diagonals)</p>
+              </div>
+              <div className="rules-section">
+                <h3>Turn Timer</h3>
+                <p>30 seconds per turn</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
+
+function countLines(marked, size) {
+  let count = 0;
+
+  for (let row = 0; row < size; row++) {
+    if (marked.slice(row * size, (row + 1) * size).every(m => m)) count++;
+  }
+
+  for (let col = 0; col < size; col++) {
+    let complete = true;
+    for (let row = 0; row < size; row++) {
+      if (!marked[row * size + col]) { complete = false; break; }
+    }
+    if (complete) count++;
+  }
+
+  let diag1Complete = true;
+  for (let i = 0; i < size; i++) {
+    if (!marked[i * size + i]) { diag1Complete = false; break; }
+  }
+  if (diag1Complete) count++;
+
+  let diag2Complete = true;
+  for (let i = 0; i < size; i++) {
+    if (!marked[i * size + (size - 1 - i)]) { diag2Complete = false; break; }
+  }
+  if (diag2Complete) count++;
+
+  return count;
+}
+
+export default GameRoom;
