@@ -15,7 +15,8 @@ const io = new Server(httpServer, {
     origin: [
       'http://localhost:3000',
       'http://localhost:5173',
-      'https://tangerine-travesseiro-8d8fa9.netlify.app'
+      'https://tangerine-travesseiro-8d8fa9.netlify.app',
+      'https://gridblock-mu.vercel.app'
     ],
     methods: ['GET', 'POST']
   }
